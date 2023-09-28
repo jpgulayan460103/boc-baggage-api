@@ -20,6 +20,7 @@ class CreateTravelersTable extends Migration
             $table->string('middle_name')->nullable()->fulltext();
             $table->string('gender')->nullable();
             $table->date('birth_date')->nullable();
+            $table->string('citizenship')->nullable();
             $table->string('passport_number')->nullable();
             $table->string('passport_place_issued')->nullable();
             $table->date('passport_date_issued')->nullable();
@@ -30,7 +31,7 @@ class CreateTravelersTable extends Migration
             $table->string('origin_country')->nullable()->fulltext();
             $table->date('arrival_date')->nullable()->index();
             $table->string('flight_number')->nullable()->fulltext();
-            $table->string('remarks')->nullable()->index();
+            $table->string('remarks')->nullable()->fulltext();
             $table->timestamps();
             $table->softDeletes();
         });
