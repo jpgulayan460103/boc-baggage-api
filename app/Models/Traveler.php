@@ -72,7 +72,7 @@ class Traveler extends Model
         ->timezone(config('app.timezone'))
         ->format('m/d/Y');
     }
-    public function getPassportDateIssueAttribute($value)
+    public function getPassportDateIssuedAttribute($value)
     {
         return Carbon::createFromTimestamp(strtotime($value))
         ->timezone(config('app.timezone'))

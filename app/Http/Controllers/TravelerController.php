@@ -77,9 +77,22 @@ class TravelerController extends Controller
         }else{
             $query->orderBy('id', 'desc');
         }
+
+        if($request->searchQuery){
+            $keywords = explode(" ", $request->searchQuery);
+            if($keywords != []){
+                $query->where(function($subQuery) use ($keywords){
+                    foreach ($keywords as $keyword) {
+                        $subQuery->orWhere('last_name', 'like', "%$keyword%");
+                        $subQuery->orWhere('first_name', 'like', "%$keyword%");
+                        $subQuery->orWhere('middle_name', 'like', "%$keyword%");
+                    }
+                });
+            }
+        }
         
 
-        $travelers = $query->simplePaginate(20);
+        $travelers = $query->paginate(20);
         return [
             'travelers' => $travelers,
             'query' => DB::getQueryLog(),
@@ -150,8 +163,8 @@ class TravelerController extends Controller
      * @param  \App\Models\Traveler  $traveler
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Traveler $traveler)
+    public function destroy($id)
     {
-        //
+        Traveler::findOrFail($id)->delete();
     }
 }
