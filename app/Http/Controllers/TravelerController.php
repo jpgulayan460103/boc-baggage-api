@@ -7,6 +7,8 @@ use App\Models\Traveler;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TravelerController extends Controller
 {
@@ -15,10 +17,10 @@ class TravelerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $isExport = false)
     {
         DB::enableQueryLog();
-        $query = Traveler::query(20);
+        $query = Traveler::query();
 
         $filters = $request->filters;
         $sorters = $request->sorters;
@@ -92,9 +94,9 @@ class TravelerController extends Controller
         }
         
 
-        $travelers = $query->paginate(20);
+        $travelers = $isExport ? $query->paginate(200) : $query->paginate(20);
         return [
-            'travelers' => $travelers,
+            'travelers' => $travelers->toArray(),
             'query' => DB::getQueryLog(),
         ];
     }
@@ -166,5 +168,118 @@ class TravelerController extends Controller
     public function destroy($id)
     {
         Traveler::findOrFail($id)->delete();
+    }
+
+    public function createExport(Request $request)
+    {
+        $datetime = Carbon::now();
+        $filename = 'export-travelers-'.$datetime->toDateString().'-'.$datetime->format('H-i-s').'.csv';
+        $file_location = "exported/$filename";
+        $temp_local_file_location = public_path("tmp/$filename");
+        $file = fopen($temp_local_file_location, 'w+');
+
+        $headers = [
+            'Surname',
+            'First Name',
+            'Middle Name',
+            'Gender',
+            'Birthdate',
+            'Citizenship',
+            'Passport Number',
+            'Place Issued',
+            'Date Issued',
+            'Occupation',
+            'Contact Number',
+            'Address in the PH',
+            'Last Departure Date',
+            'Country Origin',
+            'Airline/Flight Number',
+            'Date of Arrival',
+            'Remarks',
+        ];
+
+        fputcsv($file, $headers);
+        fclose($file);
+        Storage::put($file_location, file_get_contents($temp_local_file_location));
+
+        if (file_exists($temp_local_file_location)) {
+            unlink($temp_local_file_location);
+        }
+
+        $travelers = (array)$this->index($request, $isExport = true);
+
+        return [
+            'total_pages' => $travelers['travelers']['last_page'],
+            'filename' => $filename,
+            'file_location' => $file_location,
+        ];
+    }
+
+    public function writeExport(Request $request)
+    {
+        $filename = $request->filename;
+        $file_location = $request->file_location;
+
+        $temp_filename = (string) Str::uuid().'.csv';
+        $temp_local_file_location = public_path("tmp/$temp_filename");
+
+        if (! file_exists($temp_local_file_location)) {
+            $file = Storage::get($file_location);
+            file_put_contents($temp_local_file_location, $file);
+        }
+
+        $filters = [];
+
+        $file = fopen($temp_local_file_location, 'a+');
+
+        $for_export = [];
+
+        $travelers = (array)$this->index($request, $isExport = true);
+
+        foreach ($travelers['travelers']['data'] as $traveler) {
+            $export_data = [
+                $traveler['last_name'],
+                $traveler['first_name'],
+                $traveler['middle_name'],
+                $traveler['gender'],
+                $traveler['birth_date'],
+                $traveler['citizenship'],
+                $traveler['passport_number'],
+                $traveler['passport_place_issued'],
+                $traveler['passport_date_issued'],
+                $traveler['occupation'],
+                $traveler['contact_number'],
+                $traveler['philippines_address'],
+                $traveler['last_departure_date'],
+                $traveler['origin_country'],
+                $traveler['flight_number'],
+                $traveler['arrival_date'],
+                $traveler['remarks'],
+            ];
+            fputcsv($file, $export_data);
+        }
+
+        // return $for_export;
+
+        foreach ($for_export as $export_data) {
+            fputcsv($file, $export_data);
+        }
+        fclose($file);
+
+        Storage::put($file_location, file_get_contents($temp_local_file_location));
+
+        if (file_exists($temp_local_file_location)) {
+            unlink($temp_local_file_location);
+        }
+
+        return [
+            'current_page' => $request->page,
+            'filename' => $filename,
+        ];
+    }
+
+    public function downloadExport(Request $request) {
+        $file_location = $request->file_location;
+        return Storage::download($file_location);
     }
 }
