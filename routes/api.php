@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\TravelerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,3 +26,4 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/exports', [TravelerController::class, 'createExport']);
 Route::put('/exports', [TravelerController::class, 'writeExport']);
 Route::get('/exports', [TravelerController::class, 'downloadExport']);
+Route::get('/libraries', [LibraryController::class, 'index']);

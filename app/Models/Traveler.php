@@ -29,6 +29,12 @@ class Traveler extends Model
         'arrival_date',
         'flight_number',
         'remarks',
+        'airline',
+        'findings',
+        'amount',
+        'traveler_type',
+        'travel_purpose',
+        'company',
     ];
 
     protected $dates = [

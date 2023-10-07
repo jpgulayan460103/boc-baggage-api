@@ -17,5 +17,9 @@ class DatabaseSeeder extends Seeder
     {
         User::factory(10)->create();
         Traveler::factory(4500)->create();
+        
+        $this->call([
+            LibrarySeeder::class,
+        ]);
     }
 }

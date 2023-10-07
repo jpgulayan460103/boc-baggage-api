@@ -56,6 +56,19 @@ class TravelerController extends Controller
             }
         }
 
+        if(isset($filters['arrival_date']) && $filters['arrival_date'] != []){
+            if(isset($filters['arrival_date'][0]) && isset($filters['arrival_date'][1])){
+                $query->whereBetween('arrival_date', [
+                    Carbon::parse($filters['arrival_date'][0]),
+                    Carbon::parse($filters['arrival_date'][1]),
+                ]);
+            }elseif(!isset($filters['arrival_date'][0]) && isset($filters['arrival_date'][1])){
+                $query->where('arrival_date', '<=', Carbon::parse($filters['arrival_date'][1]));
+            }elseif(isset($filters['arrival_date'][0]) && !isset($filters['arrival_date'][1])){
+                $query->where('arrival_date', '>=', Carbon::parse($filters['arrival_date'][0]));
+            }
+        }
+
         if(isset($filters['created_at']) && $filters['created_at'] != []){
             if(isset($filters['created_at'][0]) && isset($filters['created_at'][1])){
                 $query->whereBetween('created_at', [
@@ -149,7 +162,7 @@ class TravelerController extends Controller
      * @param  \App\Models\Traveler  $traveler
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(TravelerRequest $request, $id)
     {
         $traveler = Traveler::findOrFail($id);
         $traveler->update($request->all());
@@ -187,13 +200,17 @@ class TravelerController extends Controller
             'Place Issued',
             'Date Issued',
             'Occupation',
+            'Company',
             'Contact Number',
             'Address in the PH',
             'Last Departure Date',
             'Country Origin',
-            'Airline/Flight Number',
+            'Airline',
+            'Flight Number',
             'Date of Arrival',
             'Remarks',
+            'Findings',
+            'Amount',
         ];
 
         fputcsv($file, $headers);
@@ -246,13 +263,17 @@ class TravelerController extends Controller
                 $traveler['passport_place_issued'],
                 $traveler['passport_date_issued'],
                 $traveler['occupation'],
+                $traveler['company'],
                 $traveler['contact_number'],
                 $traveler['philippines_address'],
                 $traveler['last_departure_date'],
                 $traveler['origin_country'],
+                $traveler['airline'],
                 $traveler['flight_number'],
                 $traveler['arrival_date'],
                 $traveler['remarks'],
+                $traveler['findings'],
+                $traveler['amount'],
             ];
             fputcsv($file, $export_data);
         }
