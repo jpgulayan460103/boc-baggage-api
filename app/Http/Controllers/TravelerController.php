@@ -85,16 +85,14 @@ class TravelerController extends Controller
             if($keywords != []){
                 $query->where(function($subQuery) use ($keywords){
                     foreach ($keywords as $keyword) {
-                        $subQuery->orWhere('last_name', 'like', "%$keyword%");
-                        $subQuery->orWhere('first_name', 'like', "%$keyword%");
-                        $subQuery->orWhere('middle_name', 'like', "%$keyword%");
+                        $subQuery->where('fullname', 'like', "%$keyword%");
                     }
                 });
             }
         }
         
 
-        $travelers = $isExport ? $query->paginate(200) : $query->paginate(20);
+        $travelers = $isExport ? $query->paginate(2000) : $query->paginate(20);
         return [
             'travelers' => $travelers->toArray(),
             'query' => DB::getQueryLog(),

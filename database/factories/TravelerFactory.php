@@ -18,8 +18,8 @@ class TravelerFactory extends Factory
     {
         return [
             'last_name' => $this->faker->lastName,
-            'first_name' => $this->faker->lastName,
-            'middle_name' => $this->faker->firstName,
+            'first_name' => $this->faker->firstName,
+            'middle_name' => $this->faker->lastName,
             'gender' => $this->faker->randomElement(['Male', 'Female']),
             'birth_date' => $this->faker->date($format = 'Y-m-d', $max = 'now'),
             'citizenship' => $this->faker->randomElement($this->citizenships()),
