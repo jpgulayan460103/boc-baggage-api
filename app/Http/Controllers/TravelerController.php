@@ -20,7 +20,7 @@ class TravelerController extends Controller
     public function index(Request $request, $isExport = false)
     {
         DB::enableQueryLog();
-        $query = Traveler::query();
+        $query = Traveler::with('customFindings');
 
         $filters = $request->filters;
         $sorters = $request->sorters;
@@ -130,7 +130,20 @@ class TravelerController extends Controller
      */
     public function store(TravelerRequest $request)
     {
-        return Traveler::create($request->all());
+        try {
+            DB::beginTransaction();
+            $traveler = Traveler::create($request->all());
+            if($request->customFindings && $request->customFindings != array()){
+                $customFindings = $request->customFindings;
+                foreach ($customFindings as $customFinding) {
+                    $traveler->customFindings()->create($customFinding);
+                }
+            }
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 
     /**
@@ -164,10 +177,24 @@ class TravelerController extends Controller
      */
     public function update(TravelerRequest $request, $id)
     {
-        $traveler = Traveler::findOrFail($id);
-        $traveler->update($request->all());
+        try {
+            DB::beginTransaction();
+            $traveler = Traveler::findOrFail($id);
+            $traveler->update($request->all());
+            $traveler->customFindings()->delete();
+            if($request->customFindings && $request->customFindings != array()){
+                $customFindings = $request->customFindings;
+                foreach ($customFindings as $customFinding) {
+                    $traveler->customFindings()->create($customFinding);
+                }
+            }
+            DB::commit();
+            return $traveler;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
 
-        return $traveler;
     }
 
     /**

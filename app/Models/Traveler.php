@@ -108,5 +108,9 @@ class Traveler extends Model
         ->timezone(config('app.timezone'))
         ->format('m/d/Y');
     }
+
+    public function customFindings() {
+        return $this->hasMany(Finding::class);
+    }
     
 }
