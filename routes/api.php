@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('travelers', TravelerController::class)->middleware('auth:api');
-Route::resource('libraries', LibraryController::class)->middleware('auth:api');
+Route::resource('libraries', LibraryController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
 

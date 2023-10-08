@@ -28,11 +28,11 @@ class TravelerRequest extends FormRequest
             'last_name' => ['required', 'max:250', 'string'],
             'first_name' => ['required', 'max:250', 'string'],
             'middle_name' => ['max:250'],
-            'gender' => ['required', 'max:250', 'string'],
+            'gender' => ['max:250'],
             'birth_date' => ['required', 'date'],
-            'passport_number' => ['required', 'max:250'],
+            'passport_number' => ['max:250'],
             'passport_place_issued' => ['max:250'],
-            'passport_date_issued' => ['required', 'date'],
+            // 'passport_date_issued' => ['date'],
             'occupation' => ['max:250'],
             'contact_number' => ['max:250'],
             'philippines_address' => ['max:250'],
@@ -41,8 +41,8 @@ class TravelerRequest extends FormRequest
             'arrival_date' => ['required', 'date'],
             'flight_number' => ['required', 'max:250', 'string'],
             'airline' => ['required', 'max:250', 'string'],
-            'traveler_type' => ['required', 'max:250', 'string'],
-            'travel_purpose' => ['required', 'max:250', 'string'],
+            'traveler_type' => ['max:250'],
+            'travel_purpose' => ['max:250'],
             'remarks' => ['required', 'max:250', 'string'],
             'findings' => ['max:250'],
             'amount' => ['max:250'],
@@ -59,6 +59,14 @@ class TravelerRequest extends FormRequest
                     Carbon::parse($last_departure_date);
                 } catch (\Exception $e) {
                     $validator->errors()->add('last_departure_date', 'The last departure date is not a valid date.');
+                }
+            }
+            if (request()->has('passport_date_issued')) {
+                try {
+                    $passport_date_issued = request('passport_date_issued');
+                    Carbon::parse($passport_date_issued);
+                } catch (\Exception $e) {
+                    $validator->errors()->add('passport_date_issued', 'The passport date issued is not a valid date.');
                 }
             }
         });
