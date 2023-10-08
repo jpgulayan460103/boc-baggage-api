@@ -22,8 +22,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('travelers', TravelerController::class)->middleware('auth:api');
+Route::resource('libraries', LibraryController::class)->middleware('auth:api');
+
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::post('/exports', [TravelerController::class, 'createExport']);
 Route::put('/exports', [TravelerController::class, 'writeExport']);
 Route::get('/exports', [TravelerController::class, 'downloadExport']);
-Route::get('/libraries', [LibraryController::class, 'index']);

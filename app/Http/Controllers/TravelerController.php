@@ -42,6 +42,22 @@ class TravelerController extends Controller
             $remarks = $filters['remarks'];
             $query->where('remarks', 'like', "%$remarks%");
         }
+        if(isset($filters['airline'])){
+            $airline = $filters['airline'];
+            $query->where('airline', 'like', "%$airline%");
+        }
+        if(isset($filters['flight_number'])){
+            $flight_number = $filters['flight_number'];
+            $query->where('flight_number', 'like', "%$flight_number%");
+        }
+        if(isset($filters['traveler_type'])){
+            $traveler_type = $filters['traveler_type'];
+            $query->where('traveler_type', 'like', "%$traveler_type%");
+        }
+        if(isset($filters['travel_purpose'])){
+            $travel_purpose = $filters['travel_purpose'];
+            $query->where('travel_purpose', 'like', "%$travel_purpose%");
+        }
 
         if(isset($filters['last_departure_date']) && $filters['last_departure_date'] != []){
             if(isset($filters['last_departure_date'][0]) && isset($filters['last_departure_date'][1])){

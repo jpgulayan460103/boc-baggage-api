@@ -38,7 +38,14 @@ class LibraryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $library = Library::create([
+            'name' => $request->name,
+            'library_type' => $request->library_type,
+            'library_setting' => $request->library_setting,
+        ]);
+        return [
+            'library' => $library
+        ];
     }
 
     /**
@@ -70,9 +77,17 @@ class LibraryController extends Controller
      * @param  \App\Models\Library  $library
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Library $library)
+    public function update(Request $request, $id)
     {
-        //
+        $library = Library::findOrFail($id);
+        $library->update([
+            'name' => $request->name,
+            'library_type' => $request->library_type,
+            'library_setting' => $request->library_setting,
+        ]);
+        return [
+            'library' => $library
+        ];
     }
 
     /**
@@ -81,8 +96,8 @@ class LibraryController extends Controller
      * @param  \App\Models\Library  $library
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Library $library)
+    public function destroy($id)
     {
-        //
+        Library::findOrFail($id)->delete();
     }
 }

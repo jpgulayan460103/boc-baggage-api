@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Library extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'library_type',
+        'library_setting',
+    ];
 }
