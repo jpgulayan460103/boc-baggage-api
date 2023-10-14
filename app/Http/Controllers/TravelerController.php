@@ -20,7 +20,7 @@ class TravelerController extends Controller
     public function index(Request $request, $isExport = false)
     {
         DB::enableQueryLog();
-        $query = Traveler::with('customFindings');
+        $query = Traveler::with(['customFindings', 'companions']);
 
         $filters = $request->filters;
         $sorters = $request->sorters;
@@ -117,6 +117,11 @@ class TravelerController extends Controller
                         $subQuery->where('fullname', 'like', "%$keyword%");
                     }
                 });
+                $query->orWhereHas('companions', function($subQuery) use ($keywords){
+                    foreach ($keywords as $keyword) {
+                        $subQuery->where('fullname', 'like', "%$keyword%");
+                    }
+                });
             }
         }
         
@@ -153,6 +158,12 @@ class TravelerController extends Controller
                 $customFindings = $request->customFindings;
                 foreach ($customFindings as $customFinding) {
                     $traveler->customFindings()->create($customFinding);
+                }
+            }
+            if($request->companions && $request->companions != array()){
+                $companions = $request->companions;
+                foreach ($companions as $companion) {
+                    $traveler->companions()->create($companion);
                 }
             }
             DB::commit();
@@ -202,6 +213,14 @@ class TravelerController extends Controller
                 $customFindings = $request->customFindings;
                 foreach ($customFindings as $customFinding) {
                     $traveler->customFindings()->create($customFinding);
+                }
+            }
+
+            $traveler->companions()->delete();
+            if($request->companions && $request->companions != array()){
+                $companions = $request->companions;
+                foreach ($companions as $companion) {
+                    $traveler->companions()->create($companion);
                 }
             }
             DB::commit();

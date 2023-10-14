@@ -132,5 +132,9 @@ class Traveler extends Model
     public function customFindings() {
         return $this->hasMany(Finding::class);
     }
+
+    public function companions() {
+        return $this->hasMany(TravelerCompanion::class);
+    }
     
 }
